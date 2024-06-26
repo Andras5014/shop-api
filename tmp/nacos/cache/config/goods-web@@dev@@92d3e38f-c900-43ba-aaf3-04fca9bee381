@@ -1,0 +1,16 @@
+{
+    "name": "goods-web",
+    "host":"host.docker.internal",
+    "port": 8022,
+    "tags":["goods","web"],
+    "goods_srv": {
+        "name": "goods-srv"
+    },
+    "jwt": {
+        "key": "andras"
+    },
+    "consul": {
+        "host": "127.0.0.1",
+        "port": 8500
+    }
+}

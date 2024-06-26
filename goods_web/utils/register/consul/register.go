@@ -1,0 +1,65 @@
+package consul
+
+import (
+	"fmt"
+	"github.com/hashicorp/consul/api"
+)
+
+type Registry struct {
+	Host string
+	Port int
+}
+type RegistryClient interface {
+	Register(name, id, address string, port int, tags []string) error
+	DeRegister(id string) error
+}
+
+func NewRegistryClient(host string, port int) RegistryClient {
+	return &Registry{
+		Host: host,
+		Port: port,
+	}
+}
+func (r *Registry) Register(name, id, address string, port int, tags []string) error {
+	cfg := api.DefaultConfig()
+	cfg.Address = fmt.Sprintf("%s:%d", r.Host, r.Port)
+	client, err := api.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	// 生成对应检查对象
+	check := &api.AgentServiceCheck{
+		HTTP:                           fmt.Sprintf("http://%s:%d/health", address, port),
+		Timeout:                        "5s",
+		Interval:                       "30s",
+		DeregisterCriticalServiceAfter: "60s",
+	}
+	registration := &api.AgentServiceRegistration{
+		ID:      id,
+		Name:    name,
+		Port:    8022,
+		Tags:    tags,
+		Address: r.Host,
+		Check:   check,
+	}
+
+	err = client.Agent().ServiceRegister(registration)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
+func (r *Registry) DeRegister(id string) error {
+	cfg := api.DefaultConfig()
+	cfg.Address = fmt.Sprintf("%s:%d", r.Host, r.Port)
+	client, err := api.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+	err = client.Agent().ServiceDeregister(id)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}

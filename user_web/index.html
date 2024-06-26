@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+    <button id="query"  type="button">点击</button>
+<div id="content" style="background-color: aqua;width: auto;height: auto;"></div>
+</body>
+<script type="text/javascript">
+    $("#query").click(function () {
+        $.ajax({
+            type: "get",
+            url: "http://localhost:8021/api/v1/user/list",
+            beforeSend: function (request) {
+                request.setRequestHeader("x-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MywiTmlja05hbWUiOiJ1c2VyMiIsIkF1dGhvcml0eUlkIjoxLCJleHAiOjE3MTc5NDg5ODUsImlzcyI6ImFuZHJhcyIsIm5iZiI6MTcxNzM0NDE4NX0.2xe9QnYGtc9uVm8ack8Qh5sM6hwo329qyV4htgA5urU")
+            },
+
+            dataType: "json",
+            success: function (result) {
+                console.log(result.data);
+                $("#content").text(result.data)
+            },
+            error: function (data) {
+                alert("error");
+            }
+        });
+        
+    })
+</script>
+</html>

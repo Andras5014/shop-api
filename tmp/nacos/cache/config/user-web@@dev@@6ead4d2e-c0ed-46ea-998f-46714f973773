@@ -1,0 +1,27 @@
+{
+    "name": "user-web",
+    "port": 8023,
+    "host":"host.docker.internal",
+    "tags":["user","web"],
+    "user_srv": {
+        "host": "127.0.0.1",
+        "port": 50051,
+        "name": "user-srv"
+    },
+    "jwt": {
+        "key": "andras"
+    },
+    "ali_sms": {
+        "access_key_id": "LTAI5tC271uhkqAgZJ6xgNyU",
+        "access_key_secret": "rHF3I09bgoUNM3X0qL4NYpXQ6JkLcq"
+    },
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
+        "expiration": 300
+    },
+    "consul": {
+        "host": "127.0.0.1",
+        "port": 8500
+    }
+}
