@@ -171,8 +171,8 @@ func PasswordLogin(ctx *gin.Context) {
 				NickName:    resp.NickName,
 				AuthorityId: int(resp.Role),
 				StandardClaims: jwt.StandardClaims{
-					NotBefore: time.Now().Unix(),                 // 签名生效时间
-					ExpiresAt: time.Now().Unix() + 60*60*24*7*60, // 签名失效时间7天
+					NotBefore: time.Now().Unix(),                       // 签名生效时间
+					ExpiresAt: time.Now().Unix() + 60*60*24*7*60*10000, // 签名失效时间7天
 					Issuer:    "andras",
 				},
 			}

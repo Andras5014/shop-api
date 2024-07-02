@@ -12,7 +12,7 @@ import (
 
 func InitSrvConn() {
 
-	//连接user grpc 服务
+	//连接goods grpc 服务
 	consulInfo := global.ServerConfig.ConsulInfo
 
 	goodsConn, err := grpc.NewClient(
