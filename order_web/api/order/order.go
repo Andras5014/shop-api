@@ -73,7 +73,6 @@ func List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, reMap)
 }
 
-// 链路的起点在哪里 http请求
 func New(ctx *gin.Context) {
 	orderForm := forms.CreateOrderForm{}
 	if err := ctx.ShouldBindJSON(&orderForm); err != nil {

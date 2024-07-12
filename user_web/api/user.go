@@ -303,7 +303,7 @@ func UpdateUser(ctx *gin.Context) {
 	zap.S().Infof("访问用户: %d", currentUser.ID)
 
 	//将前端传递过来的日期格式转换成int
-	loc, _ := time.LoadLocation("Local") //local的L必须大写
+	loc, _ := time.LoadLocation("Local")
 	birthDay, _ := time.ParseInLocation("2006-01-02", updateUserForm.Birthday, loc)
 	_, err := global.UserSrvClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
 		Id:       int32(currentUser.ID),
