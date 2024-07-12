@@ -12,8 +12,8 @@
         "key": "andras"
     },
     "ali_sms": {
-        "access_key_id": "LTAI5tC271uhkqAgZJ6xgNyU",
-        "access_key_secret": "rHF3I09bgoUNM3X0qL4NYpXQ6JkLcq"
+        "access_key_id": "JLTAI5tC271uhkqAgZJ6xgNyUr",
+        "access_key_secret": "RrHF3I09bgoUNM3X0qL4NYpXQ6JkLcqj"
     },
     "redis": {
         "host": "127.0.0.1",
