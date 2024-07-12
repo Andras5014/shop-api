@@ -4,8 +4,8 @@
     "tags": ["oss","web"],
     "port":8029,
     "oss":{
-        "key":"LTAI5tFRGb7fZJ3kfHDUE39g",
-        "secrect":"S39Xi70Peb7SytDuqabuLQrFofNpkb",
+        "key":"JLTAI5tFRGb7fZJ3kfHDUE39gr",
+        "secrect":"RS39Xi70Peb7SytDuqabuLQrFofNpkbj",
         "host":"http://andras-shop-files.oss-cn-chengdu.aliyuncs.com",
         "callback_url":"http://fzp9nm.natappfree.cc/oss/v1/oss/callback",
         "upload_dir":"shop-images/"
