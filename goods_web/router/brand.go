@@ -17,7 +17,7 @@ func InitBrandRouter(Router *gin.RouterGroup) {
 		BrandRouter.PUT("/:id", brands.UpdateBrand)    //修改品牌信息
 	}
 
-	CategoryBrandRouter := Router.Group("categorybrands")
+	CategoryBrandRouter := Router.Group("categorybrands").Use(middlewares.Trace())
 	{
 		CategoryBrandRouter.GET("", brands.CategoryBrandList)          // 类别品牌列表页
 		CategoryBrandRouter.DELETE("/:id", brands.DeleteCategoryBrand) // 删除类别品牌

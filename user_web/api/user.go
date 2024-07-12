@@ -264,14 +264,56 @@ func Register(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":       200,
-		"msg":        "登陆成功",
+		"id":         resp.Id,
+		"nick_name":  resp.NickName,
 		"token":      token,
-		"expired_at": time.Now().Unix() + 60*60*24*7,
-		"data": gin.H{
-			"user_id":   resp.Id,
-			"user_name": resp.NickName,
-		},
+		"expired_at": (time.Now().Unix() + 60*60*24*30) * 1000,
 	})
 
+}
+func GetUserDetail(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*models.CustomClaims)
+	zap.S().Infof("访问用户: %d", currentUser.ID)
+
+	rsp, err := global.UserSrvClient.GetUserById(context.Background(), &proto.IdRequest{
+		Id: int32(currentUser.ID),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"name":     rsp.NickName,
+		"birthday": time.Unix(int64(rsp.Birthday), 0).Format("2006-01-02"),
+		"gender":   rsp.Gender,
+		"mobile":   rsp.Mobile,
+	})
+}
+
+func UpdateUser(ctx *gin.Context) {
+	updateUserForm := forms.UpdateUserForm{}
+	if err := ctx.ShouldBind(&updateUserForm); err != nil {
+		HandleValidatorError(ctx, err)
+		return
+	}
+
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*models.CustomClaims)
+	zap.S().Infof("访问用户: %d", currentUser.ID)
+
+	//将前端传递过来的日期格式转换成int
+	loc, _ := time.LoadLocation("Local") //local的L必须大写
+	birthDay, _ := time.ParseInLocation("2006-01-02", updateUserForm.Birthday, loc)
+	_, err := global.UserSrvClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
+		Id:       int32(currentUser.ID),
+		NickName: updateUserForm.Name,
+		Gender:   updateUserForm.Gender,
+		Birthday: int64(birthDay.Unix()),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{})
 }

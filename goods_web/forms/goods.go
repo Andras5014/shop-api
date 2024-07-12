@@ -8,10 +8,10 @@ type GoodsForm struct {
 	MarketPrice float32  `form:"market_price" json:"market_price" binding:"required,min=0"`
 	ShopPrice   float32  `form:"shop_price" json:"shop_price" binding:"required,min=0"`
 	GoodsBrief  string   `form:"goods_brief" json:"goods_brief" binding:"required,min=3"`
-	Images      []string `form:"images" json:"images" binding:"required,min=1"`
-	DescImages  []string `form:"desc_images" json:"desc_images" binding:"required,min=1"`
+	Images      []string `form:"images" json:"images"`
+	DescImages  []string `form:"desc_images" json:"desc_images" `
 	ShipFree    *bool    `form:"ship_free" json:"ship_free" binding:"required"`
-	FrontImage  string   `form:"front_image" json:"front_image" binding:"required,url"`
+	FrontImage  string   `form:"front_image" json:"front_image"`
 	Brand       int32    `form:"brand" json:"brand" binding:"required"`
 }
 

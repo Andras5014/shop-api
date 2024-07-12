@@ -1,0 +1,19 @@
+{
+    "name": "userop-web",
+    "host":"host.docker.internal",
+    "port": 8024,
+    "tags":["userop","web"],
+    "goods_srv": {
+        "name": "goods-srv"
+    },
+    "userop_srv": {
+        "name": "userop-srv"
+    },
+    "jwt": {
+        "key": "andras"
+    },
+    "consul": {
+        "host": "127.0.0.1",
+        "port": 8500
+    }
+}

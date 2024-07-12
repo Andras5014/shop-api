@@ -21,9 +21,9 @@ func Routers() *gin.Engine {
 	//添加链路追踪
 	ApiGroup := engine.Group("/g/v1")
 	router.InitGoodsRouter(ApiGroup)
-	//router.InitCategoryRouter(ApiGroup)
-	//router.InitBannerRouter(ApiGroup)
-	//router.InitBrandRouter(ApiGroup)
+	router.InitCategoryRouter(ApiGroup)
+	router.InitBannerRouter(ApiGroup)
+	router.InitBrandRouter(ApiGroup)
 
 	return engine
 }

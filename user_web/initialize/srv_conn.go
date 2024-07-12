@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/hashicorp/consul/api"
 	_ "github.com/mbobakov/grpc-consul-resolver"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"shop_api/user_web/global"
 	"shop_api/user_web/proto"
+	"shop_api/user_web/utils/otgrpc"
 )
 
 func InitSrvConn() {
@@ -20,6 +22,7 @@ func InitSrvConn() {
 		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserServerInfo.Name),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 	)
 	if err != nil {
 		zap.S().Errorw("[InitSrvConn] 连接user服务失败", "msg", err.Error())

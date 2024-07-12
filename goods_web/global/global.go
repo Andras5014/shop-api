@@ -11,5 +11,6 @@ var (
 	NacosConfig  *config.NacosConfig
 	Trans        ut.Translator
 
-	GoodsSrvClient proto.GoodsClient
+	GoodsSrvClient     proto.GoodsClient
+	InventorySrvClient proto.InventoryClient
 )

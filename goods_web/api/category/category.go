@@ -20,7 +20,7 @@ import (
 // CategoryRouter.POST("", category.New)          //新建分类
 // CategoryRouter.PUT("/:id", category.Update)    //修改分类信息
 func List(ctx *gin.Context) {
-	resp, err := global.GoodsSrvClient.GetAllCategorysList(ctx, &emptypb.Empty{})
+	resp, err := global.GoodsSrvClient.GetAllCategorysList(context.WithValue(context.Background(), "ginContext", ctx), &emptypb.Empty{})
 	if err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return
@@ -40,7 +40,7 @@ func Delete(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	_, err = global.GoodsSrvClient.DeleteCategory(ctx, &proto.DeleteCategoryRequest{Id: int32(i)})
+	_, err = global.GoodsSrvClient.DeleteCategory(context.WithValue(context.Background(), "ginContext", ctx), &proto.DeleteCategoryRequest{Id: int32(i)})
 	if err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return
@@ -56,7 +56,7 @@ func Detail(ctx *gin.Context) {
 	}
 	reMap := make(map[string]interface{})
 	subCategorys := make([]interface{}, 0)
-	if r, err := global.GoodsSrvClient.GetSubCategory(context.Background(), &proto.CategoryListRequest{
+	if r, err := global.GoodsSrvClient.GetSubCategory(context.WithValue(context.Background(), "ginContext", ctx), &proto.CategoryListRequest{
 		Id: int32(i),
 	}); err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
@@ -90,7 +90,7 @@ func New(ctx *gin.Context) {
 		return
 	}
 
-	rsp, err := global.GoodsSrvClient.CreateCategory(context.Background(), &proto.CategoryInfoRequest{
+	rsp, err := global.GoodsSrvClient.CreateCategory(context.WithValue(context.Background(), "ginContext", ctx), &proto.CategoryInfoRequest{
 		Name:           categoryForm.Name,
 		IsTab:          *categoryForm.IsTab,
 		Level:          categoryForm.Level,
@@ -103,10 +103,10 @@ func New(ctx *gin.Context) {
 
 	request := make(map[string]interface{})
 	request["id"] = rsp.Id
-	request["name"] = rsp.Name
-	request["parent"] = rsp.ParentCategory
-	request["level"] = rsp.Level
-	request["is_tab"] = rsp.IsTab
+	//request["name"] = rsp.Name
+	//request["parent"] = rsp.ParentCategory
+	//request["level"] = rsp.Level
+	//request["is_tab"] = rsp.IsTab
 
 	ctx.JSON(http.StatusOK, request)
 
@@ -133,7 +133,7 @@ func Update(ctx *gin.Context) {
 	if categoryForm.IsTab != nil {
 		request.IsTab = *categoryForm.IsTab
 	}
-	_, err = global.GoodsSrvClient.UpdateCategory(context.Background(), request)
+	_, err = global.GoodsSrvClient.UpdateCategory(context.WithValue(context.Background(), "ginContext", ctx), request)
 	if err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return

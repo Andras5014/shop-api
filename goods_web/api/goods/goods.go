@@ -55,7 +55,7 @@ func List(ctx *gin.Context) {
 	brandIdInt, _ := strconv.Atoi(brandId)
 	request.Brand = int32(brandIdInt)
 
-	resp, err := global.GoodsSrvClient.GoodsList(context.Background(), request)
+	resp, err := global.GoodsSrvClient.GoodsList(context.WithValue(context.Background(), "ginContext", ctx), request)
 	if err != nil {
 		zap.S().Errorw("[List] 查询商品列表失败", "msg", err.Error())
 		api.HandleGrpcErrorToHttp(err, ctx)
@@ -104,7 +104,7 @@ func New(ctx *gin.Context) {
 		return
 	}
 	goodsClient := global.GoodsSrvClient
-	resp, err := goodsClient.CreateGoods(context.Background(), &proto.CreateGoodsInfo{
+	resp, err := goodsClient.CreateGoods(context.WithValue(context.Background(), "ginContext", ctx), &proto.CreateGoodsInfo{
 		Name:            goodsForm.Name,
 		GoodsSn:         goodsForm.GoodsSn,
 		Stocks:          goodsForm.Stocks,
@@ -134,7 +134,7 @@ func Detail(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	resp, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &proto.GoodInfoRequest{
+	resp, err := global.GoodsSrvClient.GetGoodsDetail(context.WithValue(context.Background(), "ginContext", ctx), &proto.GoodInfoRequest{
 		Id: int32(i),
 	})
 	if err != nil {
@@ -142,16 +142,27 @@ func Detail(ctx *gin.Context) {
 		return
 	}
 
+	inventory, err := global.InventorySrvClient.InvDetail(context.WithValue(context.Background(), "ginContext", ctx), &proto.GoodsInvInfo{
+		GoodsId: resp.Id,
+	})
+	if err != nil {
+		api.HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+
 	goodsDetail := map[string]interface{}{
-		"id":          resp.Id,
-		"name":        resp.Name,
-		"goods_brief": resp.GoodsBrief,
-		"desc":        resp.GoodsDesc,
-		"ship_free":   resp.ShipFree,
-		"images":      resp.Images,
-		"desc_images": resp.DescImages,
-		"front_image": resp.GoodsFrontImage,
-		"shop_price":  resp.ShopPrice,
+		"id":           resp.Id,
+		"name":         resp.Name,
+		"goods_brief":  resp.GoodsBrief,
+		"goods_sn":     resp.GoodsSn,
+		"stocks":       inventory.Num,
+		"desc":         resp.GoodsDesc,
+		"ship_free":    resp.ShipFree,
+		"images":       resp.Images,
+		"desc_images":  resp.DescImages,
+		"front_image":  resp.GoodsFrontImage,
+		"shop_price":   resp.ShopPrice,
+		"market_price": resp.MarketPrice,
 		"category": map[string]interface{}{
 			"id":   resp.Category.Id,
 			"name": resp.Category.Name,
@@ -177,7 +188,7 @@ func Delete(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	_, err = global.GoodsSrvClient.DeleteGoods(context.Background(), &proto.DeleteGoodsInfo{Id: int32(i)})
+	_, err = global.GoodsSrvClient.DeleteGoods(context.WithValue(context.Background(), "ginContext", ctx), &proto.DeleteGoodsInfo{Id: int32(i)})
 	if err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return
@@ -198,7 +209,7 @@ func Update(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	if _, err := global.GoodsSrvClient.UpdateGoods(context.Background(), &proto.CreateGoodsInfo{
+	if _, err := global.GoodsSrvClient.UpdateGoods(context.WithValue(context.Background(), "ginContext", ctx), &proto.CreateGoodsInfo{
 		Id:              int32(i),
 		Name:            goodsForm.Name,
 		GoodsSn:         goodsForm.GoodsSn,
@@ -233,24 +244,25 @@ func Stocks(ctx *gin.Context) {
 }
 
 func UpdateStatus(ctx *gin.Context) {
-	id := ctx.Param("id")
-	i, err := strconv.ParseInt(id, 10, 32)
-	if err != nil {
-		ctx.Status(http.StatusNotFound)
+	goodsStatusForm := forms.GoodsStatusForm{}
+	if err := ctx.ShouldBindJSON(&goodsStatusForm); err != nil {
+		api.HandleValidatorError(ctx, err)
 		return
 	}
-	goodsStatusForm := forms.GoodsStatusForm{}
-	if _, err = global.GoodsSrvClient.UpdateGoods(context.Background(), &proto.CreateGoodsInfo{
+
+	id := ctx.Param("id")
+	i, err := strconv.ParseInt(id, 10, 32)
+	if _, err = global.GoodsSrvClient.UpdateGoods(context.WithValue(context.Background(), "ginContext", ctx), &proto.CreateGoodsInfo{
 		Id:     int32(i),
-		OnSale: *goodsStatusForm.OnSale,
+		IsHot:  *goodsStatusForm.IsHot,
 		IsNew:  *goodsStatusForm.IsNew,
-		IsHot:  *goodsStatusForm.OnSale,
+		OnSale: *goodsStatusForm.OnSale,
 	}); err != nil {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "更新成功",
+		"msg": "修改成功",
 	})
 
 }
